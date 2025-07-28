@@ -1,5 +1,6 @@
 import componentsImage from './assets/components.png';
 import { CORE_CONCEPTS } from './data';
+import Header from './components/Header.jsx';
 
 function CoreConcept({image, title, description}){
   return (
