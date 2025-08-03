@@ -1,16 +1,8 @@
 import componentsImage from './assets/components.png';
 import { CORE_CONCEPTS } from './data';
-import Header from './components/Header.jsx';
-
-function CoreConcept({image, title, description}){
-  return (
-    <li>
-      <img src={image} alt={title} />
-      <h3>{description}</h3>
-      <p>{title}</p>
-    </li>
-  );
-}
+import Header from './components/Header/Header.jsx';
+import CoreConcept from './components/CoreConcept/CoreConcept.jsx';
+import TabButton from './components/TabButton/TabButton.jsx';
 
 function App() {
   return (
@@ -35,6 +27,15 @@ function App() {
               description={CORE_CONCEPTS[3].description}
               image={CORE_CONCEPTS[3].image} />
           </ul>
+        </section>
+        <section id="examples">
+          <h2>Examples</h2>
+          <menu>
+            <TabButton>Components</TabButton>
+            <TabButton>JSX</TabButton>
+            <TabButton>Props</TabButton>
+            <TabButton>State</TabButton>
+          </menu>
         </section>
       </main>
     </div>
