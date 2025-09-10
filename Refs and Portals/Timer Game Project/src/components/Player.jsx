@@ -10,7 +10,7 @@ export default function Player() {
 
     // setSubmitted(false);
     setEnteredPlayerName(playerName.current.value);
-    
+    playerName.current.value = '';
   }
 
   return (
