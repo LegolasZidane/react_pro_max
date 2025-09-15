@@ -1,10 +1,15 @@
-export default function AddProjectPage() {
+export default function AddProjectPage({ onClickCancel }) {
   return (
     <div className="w-full h-full">
         <div className="ml-12 mr-60 flex flex-col text-2xl">
             
             <div className="mt-36 flex justify-end gap-2 mb-12">
-                <button className="px-4 text-black">Cancel</button>
+                <button 
+                    className="px-4 text-black"
+                    onClick={onClickCancel}
+                >
+                    Cancel
+                </button>
                 <button className="px-8 py-3 bg-black text-white rounded-lg">Save</button>
             </div>
 
