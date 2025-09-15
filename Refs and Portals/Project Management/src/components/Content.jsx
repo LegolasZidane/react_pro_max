@@ -1,10 +1,16 @@
-export default function Content() {
-    return(
-        <section className="flex flex-col w-[70%] h-full text-center items-center" id="content">
-            <img className="h-20 w-20 mt-52 mb-10" src="logo.png" />
-            <h1 className="text-gray-700 font-bold text-3xl mb-10">No Project Selected</h1>
-            <p className="text-gray-500 text-2xl mb-10">Select a project or get started with a new one</p>
-            <button className="bg-black text-gray-400 px-8 py-5 rounded-lg text-2xl">Create new project</button>
-        </section>
+import DefaultPage from "./DefaultPage.jsx";
+import AddProjectPage from "./AddProjectPage.jsx";
+import ProjectPage from "./ProjectPage.jsx";
+
+
+export default function Content({ addPressed, projectPressed }){
+
+    return (
+        <div className="w-[70%]" id="content">
+            { !addPressed && !projectPressed && <DefaultPage /> }
+            { addPressed && <AddProjectPage />}
+            { projectPressed && <ProjectPage />}
+        </div>
     );
+
 }
