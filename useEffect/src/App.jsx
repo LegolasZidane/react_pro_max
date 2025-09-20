@@ -5,11 +5,21 @@ import { AVAILABLE_PLACES } from './data.js';
 import Modal from './components/Modal.jsx';
 import DeleteConfirmation from './components/DeleteConfirmation.jsx';
 import logoImg from './assets/logo.png';
+import { sortPlacesByDistance } from './loc.js';
 
 function App() {
   const modal = useRef();
   const selectedPlace = useRef();
   const [pickedPlaces, setPickedPlaces] = useState([]);
+
+  // This is a side-effect because even though we need this to happen,
+  // this is not some renderable jsx code which a component is basically used for.
+  // Saving the data in a state from within this func will set an infinite loop => useEffect.
+  navigator.geolocation.getCurrentPosition((position) => {
+    const sortedPlaces = sortPlacesByDistance(AVAILABLE_PLACES, position.coords.latitude, position.coords.longitude);
+  
+
+  });
 
   function handleStartRemovePlace(id) {
     modal.current.open();
