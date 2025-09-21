@@ -1,4 +1,30 @@
+import { useEffect } from "react";
+import ProgressBar from "./ProgressBar";
+
+const TIMER = 3000;
+
 export default function DeleteConfirmation({ onConfirm, onCancel }) {
+
+  //tricky edge case saved by the ternary operator in Modal.jsx
+  useEffect( () => {
+
+    const timer = setTimeout(() => {
+      onConfirm();
+    }, TIMER);
+
+    return () => {
+      clearTimeout(timer);
+    };
+
+  }, [onConfirm]);
+
+  // When the modal pops up but we hit no, eventhough it closes, the place is deleted
+  // after 3 seconds because we never cleared the timer.
+  // console.log("Timer started");
+  // setTimeout(() => {
+  //   onConfirm();
+  // }, 3000);
+
   return (
     <div id="delete-confirmation">
       <h2>Are you sure?</h2>
@@ -11,6 +37,7 @@ export default function DeleteConfirmation({ onConfirm, onCancel }) {
           Yes
         </button>
       </div>
+      <ProgressBar timer={TIMER} />
     </div>
   );
 }

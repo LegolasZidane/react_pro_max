@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
 import Places from './components/Places.jsx';
 import { AVAILABLE_PLACES } from './data.js';
@@ -7,11 +7,30 @@ import DeleteConfirmation from './components/DeleteConfirmation.jsx';
 import logoImg from './assets/logo.png';
 import { sortPlacesByDistance } from './loc.js';
 
-function App() {
-  const modal = useRef();
+const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+const storedPlaces = storedIds.map( id => AVAILABLE_PLACES.find( place => place.id === id ));
+
+export default function App() {
+
+  // Even putting the code here is redundant as we just need this to run once.
+  // const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+  // const storedPlaces = storedIds.map( id => AVAILABLE_PLACES.find( place => place.id === id ));
+
+  // const modal = useRef();
   const selectedPlace = useRef();
   const [ availablePlaces, setAvailablePlaces ] = useState([]);
-  const [ pickedPlaces, setPickedPlaces ] = useState([]);
+  const [ modalIsOpen, setModalIsOpen ] = useState(false);
+  const [ pickedPlaces, setPickedPlaces ] = useState(storedPlaces);
+
+  //This would be redundant because the code below is instantaneous(sync. code).
+  //This is a side-effect, but not all side-effects need useEffect() remember.
+  // useEffect( () => {
+
+  //   const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+  //   const storedPlaces = storedIds.map( id => AVAILABLE_PLACES.find( place => place.id === id ));
+
+  //   setPickedPlaces(storedPlaces);
+  // }, []);
 
   useEffect(() => {
     
@@ -33,12 +52,14 @@ function App() {
   // });
 
   function handleStartRemovePlace(id) {
-    modal.current.open();
+    // modal.current.open();
+    setModalIsOpen(true);
     selectedPlace.current = id;
   }
 
   function handleStopRemovePlace() {
-    modal.current.close();
+    // modal.current.close();
+    setModalIsOpen(false);
   }
 
   function handleSelectPlace(id) {
@@ -59,16 +80,30 @@ function App() {
     }
   }
 
-  function handleRemovePlace() {
+  const handleRemovePlace = useCallback(function handleRemovePlace() {
     setPickedPlaces((prevPickedPlaces) =>
       prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
     );
-    modal.current.close();
-  }
+    // modal.current.close();
+    setModalIsOpen(false);
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces') || []);
+    localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter( id => id !== selectedPlace.current )));
+  }, []);
+  // function handleRemovePlace() {
+  //   setPickedPlaces((prevPickedPlaces) =>
+  //     prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+  //   );
+  //   // modal.current.close();
+  //   setModalIsOpen(false);
+
+  //   const storedIds = JSON.parse(localStorage.getItem('selectedPlaces') || []);
+  //   localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter( id => id !== selectedPlace.current )));
+  // }
 
   return (
     <>
-      <Modal ref={modal}>
+      <Modal open={modalIsOpen} onClose={handleStopRemovePlace}>{/*Changed ref to prop */}
         <DeleteConfirmation
           onCancel={handleStopRemovePlace}
           onConfirm={handleRemovePlace}
@@ -100,5 +135,3 @@ function App() {
     </>
   );
 }
-
-export default App;
