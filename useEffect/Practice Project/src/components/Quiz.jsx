@@ -1,19 +1,20 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import QUESTIONS from "../questions.js";
 import quizCompleteImg from '../assets/quiz-complete.png';
+import QuestionTimer from "./QuestionTimer.jsx";
 
 export default function Quiz() {
     
     const [ userAnswers, setUserAnswers ] = useState([]);
     //use less state, derive more from the state variables
     const activeQuestionIndex = userAnswers.length;
-    const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
-    shuffledAnswers.sort((a, b) => Math.random() - 0.5);
     const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
 
-    function handleSelectAnswer(selectedAnswer) {
+    const handleSelectAnswer = useCallback(function handleSelectAnswer(selectedAnswer) {
         setUserAnswers( prevAnswers => ( [...prevAnswers, selectedAnswer] ));
-    }
+    }, []);
+
+    const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer]);
 
     if( quizIsComplete ){
 
@@ -26,9 +27,18 @@ export default function Quiz() {
 
     }
 
+    const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
+    shuffledAnswers.sort((a, b) => Math.random() - 0.5);
+
+    //Whenever key prop changes, the component is unmounted and remounted. Very handy!!!
     return (
         <div id="quiz">
             <div id="question">
+                <QuestionTimer
+                    key={activeQuestionIndex} 
+                    timeout={10000} 
+                    onTimeout={handleSkipAnswer} 
+                />
                 <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
                 <ul id="answers">
                     {shuffledAnswers.map( answer => (
@@ -37,7 +47,8 @@ export default function Quiz() {
                             className="answer"
                         >
                             <button onClick={() => handleSelectAnswer(answer)}>{answer}</button>
-                        </li>))}
+                        </li>
+                    ))}
                 </ul>
             </div>
         </div>
