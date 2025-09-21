@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import Places from './components/Places.jsx';
 import { AVAILABLE_PLACES } from './data.js';
@@ -10,16 +10,27 @@ import { sortPlacesByDistance } from './loc.js';
 function App() {
   const modal = useRef();
   const selectedPlace = useRef();
-  const [pickedPlaces, setPickedPlaces] = useState([]);
+  const [ availablePlaces, setAvailablePlaces ] = useState([]);
+  const [ pickedPlaces, setPickedPlaces ] = useState([]);
+
+  useEffect(() => {
+    
+      navigator.geolocation.getCurrentPosition((position) => {
+      const sortedPlaces = sortPlacesByDistance(AVAILABLE_PLACES, position.coords.latitude, position.coords.longitude);
+    
+      setAvailablePlaces(sortedPlaces);
+    });
+
+  }, []);
 
   // This is a side-effect because even though we need this to happen,
   // this is not some renderable jsx code which a component is basically used for.
   // Saving the data in a state from within this func will set an infinite loop => useEffect.
-  navigator.geolocation.getCurrentPosition((position) => {
-    const sortedPlaces = sortPlacesByDistance(AVAILABLE_PLACES, position.coords.latitude, position.coords.longitude);
+  // navigator.geolocation.getCurrentPosition((position) => {
+  //   const sortedPlaces = sortPlacesByDistance(AVAILABLE_PLACES, position.coords.latitude, position.coords.longitude);
   
-
-  });
+  //   setAvailablePlaces(sortedPlaces);
+  // });
 
   function handleStartRemovePlace(id) {
     modal.current.open();
@@ -31,6 +42,7 @@ function App() {
   }
 
   function handleSelectPlace(id) {
+    //This is not because it is related to the UI???
     setPickedPlaces((prevPickedPlaces) => {
       if (prevPickedPlaces.some((place) => place.id === id)) {
         return prevPickedPlaces;
@@ -38,6 +50,13 @@ function App() {
       const place = AVAILABLE_PLACES.find((place) => place.id === id);
       return [place, ...prevPickedPlaces];
     });
+
+
+    //The code below is also a side-effect, but useEffect not required right. 
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    if( storedIds.indexOf(id) === -1 ) {
+      localStorage.setItem('selectedPlaces', JSON.stringify([id, ...storedIds]));
+    }
   }
 
   function handleRemovePlace() {
@@ -73,7 +92,8 @@ function App() {
         />
         <Places
           title="Available Places"
-          places={AVAILABLE_PLACES}
+          fallbackText={'Sorting places by distance...'}
+          places={availablePlaces}
           onSelectPlace={handleSelectPlace}
         />
       </main>
