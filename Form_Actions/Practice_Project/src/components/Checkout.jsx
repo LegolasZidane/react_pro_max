@@ -5,10 +5,27 @@ import { currencyFormatter } from "../utils/formatting";
 import Input from "./UI/Input";
 import Button from "./UI/Button";
 import UserProgressContext from "../store/UserProgressContext";
+import useHttp from "../hooks/useHttp";
+import Error from "./Error";
+
+const requestConfig = {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+};
 
 export default function Checkout() {
   const cartCtx = useContext(CartContext);
   const userProgressCtx = useContext(UserProgressContext);
+
+  const {
+    data,
+    isLoading: isSending,
+    error,
+    sendRequest,
+  } = useHttp(`http://localhost:3000/orders`, requestConfig);
+
   const cartTotal = cartCtx.items.reduce(
     (totalPrice, item) => totalPrice + item.quantity * item.price,
     0
@@ -18,26 +35,33 @@ export default function Checkout() {
     userProgressCtx.hideCheckout();
   }
 
-  function handleSubmit(event){
-
+  function handleSubmit(event) {
     event.preventDefault();
 
     const fd = new FormData(event.target);
     const customerData = Object.fromEntries(fd.entries());
 
-    fetch(`http://localhost:3000/orders`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
+    sendRequest(
+      JSON.stringify({
+        order: {
+          items: cartCtx.items,
+          customer: customerData,
         },
-        body: JSON.stringify({
-            order: {
-                items: cartCtx.items,
-                customer: customerData,
-            }
-        })
-    });
+      })
+    );
+  }
 
+  let actions = (
+    <>
+      <Button type="button" onClick={handleClose} textOnly>
+        Close
+      </Button>
+      <Button>Submit Order</Button>
+    </>
+  );
+
+  if (isSending) {
+    actions = <span>Sending order data...</span>;
   }
 
   return (
@@ -54,11 +78,10 @@ export default function Checkout() {
           <Input label="City" type="text" id="city" />
         </div>
 
+        {error && <Error title="Failed to submit order" message={error} />}
+
         <p className="modal-actions">
-          <Button type="button" onClick={handleClose} textOnly>
-            Close
-          </Button>
-          <Button>Submit Order</Button>
+          {actions}
         </p>
       </form>
     </Modal>
