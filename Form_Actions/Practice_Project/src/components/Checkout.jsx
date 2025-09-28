@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useActionState } from "react";
 import Modal from "./UI/Modal";
 import CartContext from "../store/CartContext";
 import { currencyFormatter } from "../utils/formatting";
@@ -21,9 +21,10 @@ export default function Checkout() {
 
   const {
     data,
-    isLoading: isSending,
+    // isLoading: isSending, can use pending feature of useActionState
     error,
     sendRequest,
+    clearData,
   } = useHttp(`http://localhost:3000/orders`, requestConfig);
 
   const cartTotal = cartCtx.items.reduce(
@@ -35,13 +36,16 @@ export default function Checkout() {
     userProgressCtx.hideCheckout();
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  function handleFinish() {
+    userProgressCtx.hideCheckout();
+    cartCtx.clearCart();
+    clearData();
+  }
 
-    const fd = new FormData(event.target);
+  async function checkoutAction(prevState, fd) {
     const customerData = Object.fromEntries(fd.entries());
 
-    sendRequest(
+    await sendRequest(
       JSON.stringify({
         order: {
           items: cartCtx.items,
@@ -50,6 +54,23 @@ export default function Checkout() {
       })
     );
   }
+  // function handleSubmit(event) {
+  //   event.preventDefault();
+
+  //   const fd = new FormData(event.target);
+  //   const customerData = Object.fromEntries(fd.entries());
+
+  //   sendRequest(
+  //     JSON.stringify({
+  //       order: {
+  //         items: cartCtx.items,
+  //         customer: customerData,
+  //       },
+  //     })
+  //   );
+  // }
+
+  const [formState, formAction, isSending] = useActionState(checkoutAction, null);
 
   let actions = (
     <>
@@ -60,16 +81,36 @@ export default function Checkout() {
     </>
   );
 
-  if (isSending) {
+  if (isSending) {//this is alias for pending
     actions = <span>Sending order data...</span>;
+  }
+
+  if (data && !error) {
+    return (
+      <Modal
+        open={userProgressCtx.progress === "checkout"}
+        onClose={handleFinish}
+      >
+        <h2>Success!</h2>
+        <p>Your order was submitted successfully.</p>
+        <p>
+          We will get back to you with more details via email within the next
+          few minutes.
+        </p>
+        <p className="modal-actions">
+          <Button onClick={handleFinish}>Okay</Button>
+        </p>
+      </Modal>
+    );
   }
 
   return (
     <Modal open={userProgressCtx.progress === "checkout"} onClose={handleClose}>
-      <form onSubmit={handleSubmit}>
+      <form action={formAction}>
+        {" "}
+        {/* onSubmit={handleSubmit} */}
         <h2>Checkout</h2>
         <p>Total Amount: {currencyFormatter.format(cartTotal)}</p>
-
         <Input label="Full Name" type="text" id="name" />
         <Input label="E-Mail Address" type="email" id="email" />
         <Input label="Street" type="text" id="street" />
@@ -77,12 +118,8 @@ export default function Checkout() {
           <Input label="Postal Code" type="text" id="postal-code" />
           <Input label="City" type="text" id="city" />
         </div>
-
         {error && <Error title="Failed to submit order" message={error} />}
-
-        <p className="modal-actions">
-          {actions}
-        </p>
+        <p className="modal-actions">{actions}</p>
       </form>
     </Modal>
   );
