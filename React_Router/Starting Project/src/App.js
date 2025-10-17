@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage.js";
 import ProductsPage from "./pages/ProductsPage.js";
 import RootLayout from "./pages/RootLayout.js";
 import ErrorPage from "./pages/ErrorPage.js";
+import ProductDetailPage from "./pages/ProductDetailPage.js";
 
 // https://example.com/products
 //https-> protocol
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
       { path: "/products", element: <ProductsPage /> },
+      { path: "/products/:productId", element: <ProductDetailPage /> },
     ],
   },
 ]);
