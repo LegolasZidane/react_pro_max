@@ -13,7 +13,8 @@ function ProductsPage() {
       <ul>
         {/* <li><Link to="/products/product-1">Product 1</Link></li>
         <li><Link to="/products/product-2">Product 2</Link></li>
-        <li><Link to="/products/product-3">Product 3</Link></li> */}
+        <li><Link to="/products/product-3">Product 3</Link></li> 
+        Just for the sake of a commit, nothing else sir.         */}
         {PRODUCTS.map((prod) => (
           <li key={prod.id}>
             <Link to={`/products/${prod.id}`}>{prod.title}</Link>
