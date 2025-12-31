@@ -1,7 +1,11 @@
 import { useState } from 'react';
 
+//data.js contains the image, title and description of the core_concepts.
 import { CORE_CONCEPTS } from './data.js';
+
+//Header.jsx contains the image, header and the description below it.
 import Header from './components/Header/Header.jsx';
+
 import CoreConcept from './components/CoreConcept.jsx';
 import TabButton from './components/TabButton.jsx';
 import { EXAMPLES } from './data.js';
@@ -9,6 +13,7 @@ import { EXAMPLES } from './data.js';
 function App() {
   const [selectedTopic, setSelectedTopic] = useState();
 
+    //The function name is to be noted here.
   function handleSelect(selectedButton) {
     // selectedButton => 'components', 'jsx', 'props', 'state'
     setSelectedTopic(selectedButton);

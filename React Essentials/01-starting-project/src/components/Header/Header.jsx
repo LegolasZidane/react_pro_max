@@ -1,6 +1,8 @@
+//niche way of importing images, will take heed.
 import reactImg from '../../assets/react-core-concepts.png';
 import './Header.css';
 
+//nice thing to put in a website, will take heed.
 const reactDescriptions = ['Fundamental', 'Crucial', 'Core'];
 
 function genRandomInt(max) {
