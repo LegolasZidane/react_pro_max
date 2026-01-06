@@ -1,5 +1,4 @@
 import { useState } from 'react';
-//Incomplete for some reason, in a hurry rn.
 import Header from './components/Header';
 import Input from './components/Input';
 import Output from './components/Output';
@@ -40,4 +39,4 @@ function App() {
   );
 }
 
-export default App;
+export default App

@@ -1,3 +1,4 @@
+//Just because we don't want highlighting style, we use Link instead of NavLink
 import { Link } from "react-router-dom";
 
 const PRODUCTS = [
@@ -16,6 +17,7 @@ function ProductsPage() {
         <li><Link to="/products/product-3">Product 3</Link></li>*/}
         {PRODUCTS.map((prod) => (
           <li key={prod.id}>
+            {/*Links for dynamic path parameters*/}
             <Link to={`/products/${prod.id}`}>{prod.title}</Link>
           </li>
         ))}
